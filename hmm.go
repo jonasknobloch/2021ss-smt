@@ -105,8 +105,12 @@ func main() {
 	}
 
 	fmt.Println("valid hmm initialized")
-	fmt.Printf("P(V=aby) = %f\n", forward([]string{"a", "b", "y"}, h))
-	fmt.Printf("P(V=abby) = %f\n", forward([]string{"a", "b", "b", "y"}, h))
+
+	fmt.Printf("[forward] P(V=aby) = %f\n", forward([]string{"a", "b", "y"}, h))
+	fmt.Printf("[forward] P(V=abby) = %f\n", forward([]string{"a", "b", "b", "y"}, h))
+
+	fmt.Printf("[backward] P(V=aby) = %f\n", backward([]string{"a", "b", "y"}, h))
+	fmt.Printf("[backward] P(V=abby) = %f\n", backward([]string{"a", "b", "b", "y"}, h))
 }
 
 func forward(V []string, h *hmm) float64 {
@@ -136,6 +140,38 @@ func forward(V []string, h *hmm) float64 {
 
 	for _, q := range h.states {
 		sum = sum + h.pTransition[q][h.final]*T[len(V)][q]
+	}
+
+	return sum
+}
+
+func backward(V []string, h *hmm) float64 {
+	S := make(map[int]map[string]float64)
+
+	for i := range V {
+		S[i+1] = make(map[string]float64)
+	}
+
+	for _, q := range h.states {
+		S[len(V)][q] = h.pTransition[q][h.final]
+	}
+
+	for t := len(V) - 1; t >= 1; t-- {
+		for _, q := range h.states {
+			var sum float64
+
+			for _, qq := range h.states {
+				sum = sum + h.pEmission[qq][V[t]]*h.pTransition[q][qq]*S[t+1][qq]
+			}
+
+			S[t][q] = sum
+		}
+	}
+
+	var sum float64
+
+	for _, q := range h.states {
+		sum = sum + h.pEmission[q][V[0]]*h.pTransition[h.final][q]*S[1][q]
 	}
 
 	return sum
