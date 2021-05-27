@@ -106,11 +106,53 @@ func main() {
 
 	fmt.Println("valid hmm initialized")
 
+	fmt.Printf("[naive] P(V=aby) = %f\n", naive([]string{"a", "b", "y"}, h))
+	fmt.Printf("[naive] P(V=abby) = %f\n", naive([]string{"a", "b", "b", "y"}, h))
+	fmt.Printf("[naive] P(V=abbby) = %f\n", naive([]string{"a", "b", "b", "b", "y"}, h))
+
 	fmt.Printf("[forward] P(V=aby) = %f\n", forward([]string{"a", "b", "y"}, h))
 	fmt.Printf("[forward] P(V=abby) = %f\n", forward([]string{"a", "b", "b", "y"}, h))
+	fmt.Printf("[forward] P(V=abbby) = %f\n", forward([]string{"a", "b", "b", "b", "y"}, h))
 
 	fmt.Printf("[backward] P(V=aby) = %f\n", backward([]string{"a", "b", "y"}, h))
 	fmt.Printf("[backward] P(V=abby) = %f\n", backward([]string{"a", "b", "b", "y"}, h))
+	fmt.Printf("[backward] P(V=abbby) = %f\n", backward([]string{"a", "b", "b", "b", "y"}, h))
+}
+
+func naive(V []string, h *hmm) float64 {
+	var QQ [][]string
+
+	var perm func(QQ []string, k int)
+
+	perm = func(Q []string, k int) {
+		if k == 0 {
+			CQ := make([]string, len(Q))
+			copy(CQ, Q)
+			QQ = append(QQ, CQ)
+
+			return
+		}
+
+		for i := 0; i < len(h.states); i++ {
+			perm(append(Q, h.states[i]), k-1)
+		}
+	}
+
+	perm([]string{}, len(V))
+
+	var sum float64
+
+	for _, Q := range QQ {
+		prd := float64(1)
+
+		for t := 2; t <= len(Q); t++ {
+			prd = prd * h.pTransition[Q[t-2]][Q[t-1]] * h.pEmission[Q[t-1]][V[t-1]]
+		}
+
+		sum = sum + h.pTransition[h.final][Q[0]]*h.pTransition[Q[len(Q)-1]][h.final]*h.pEmission[Q[0]][V[0]]*prd
+	}
+
+	return sum
 }
 
 func forward(V []string, h *hmm) float64 {
