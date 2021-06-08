@@ -1,6 +1,6 @@
 package hmm
 
-func Forward(V []string, h *hmm) float64 {
+func Forward(V []string, h *hmm) (float64, map[int]map[string]float64) {
 	T := make(map[int]map[string]float64)
 
 	for i := range V {
@@ -29,5 +29,5 @@ func Forward(V []string, h *hmm) float64 {
 		sum = sum + h.PTransition[q][h.final]*T[len(V)][q]
 	}
 
-	return sum
+	return sum, T
 }

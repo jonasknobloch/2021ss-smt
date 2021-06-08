@@ -1,6 +1,6 @@
 package hmm
 
-func Backward(V []string, h *hmm) float64 {
+func Backward(V []string, h *hmm) (float64, map[int]map[string]float64) {
 	S := make(map[int]map[string]float64)
 
 	for i := range V {
@@ -29,5 +29,5 @@ func Backward(V []string, h *hmm) float64 {
 		sum = sum + h.PEmission[q][V[0]]*h.PTransition[h.final][q]*S[1][q]
 	}
 
-	return sum
+	return sum, S
 }
