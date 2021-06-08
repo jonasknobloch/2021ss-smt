@@ -1,6 +1,6 @@
 package hmm
 
-func Backward(V []string, h *hmm) (float64, map[int]map[string]float64) {
+func (h *hmm) Backward(V []string) (float64, map[int]map[string]float64) {
 	S := make(map[int]map[string]float64)
 
 	for i := range V {

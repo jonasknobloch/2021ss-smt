@@ -1,6 +1,6 @@
 package hmm
 
-func Naive(V []string, h *hmm) float64 {
+func (h *hmm) Naive(V []string) float64 {
 	var QQ [][]string
 
 	var perm func(QQ []string, k int)

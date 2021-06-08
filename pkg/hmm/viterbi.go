@@ -1,6 +1,6 @@
 package hmm
 
-func Viterbi(V []string, h *hmm) []string {
+func (h *hmm) Viterbi(V []string) []string {
 	T := make(map[int]map[string]float64)
 
 	for i := range V {

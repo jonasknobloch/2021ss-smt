@@ -1,6 +1,6 @@
 package hmm
 
-func Forward(V []string, h *hmm) (float64, map[int]map[string]float64) {
+func (h *hmm) Forward(V []string) (float64, map[int]map[string]float64) {
 	T := make(map[int]map[string]float64)
 
 	for i := range V {
