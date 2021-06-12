@@ -57,14 +57,19 @@ func (h *hmm) Train(c []Sample, i int) (t, e []map[string]map[string]float64) {
 	cTr := make(map[string]map[string]float64)
 	cEm := make(map[string]map[string]float64)
 
-	for _, q := range QS {
+	cTr[h.final] = make(map[string]float64)
+
+	for _, q := range h.states {
 		cTr[q] = make(map[string]float64)
 		cEm[q] = make(map[string]float64)
 	}
 
 	for k := 1; k <= i; k++ {
-		for _, q := range QS {
-			for _, qq := range QS {
+		for _, q := range h.states {
+			cTr[h.final][q] = 0
+			cTr[q][h.final] = 0
+
+			for _, qq := range h.states {
 				cTr[q][qq] = 0
 			}
 
