@@ -1,31 +1,49 @@
 package hmm
 
+import (
+	"fmt"
+)
+
 type Sample struct {
 	V []string
 	N float64
 }
 
 func (h *hmm) Train(c []Sample, i int) (t, e []map[string]map[string]float64) {
-	U := func(V []string, t int, qi, qj string) float64 {
+	U := func(V []string, t int, qi, qj string) (u float64) {
 		p, T := h.Forward(V)
 		_, S := h.Backward(V)
 
 		if t == len(V)-1 {
-			return T[t][qi] * h.PTransition[qi][qj] * h.PEmission[qj][V[len(V)-1]] * h.PTransition[qj][h.final] / p
+			u = T[t][qi] * h.PTransition[qi][qj] * h.PEmission[qj][V[len(V)-1]] * h.PTransition[qj][h.final] / p
 		}
 
-		return T[t][qi] * h.PTransition[qi][qj] * h.PEmission[qj][V[t]] * S[t+1][qj] / p
+		u = T[t][qi] * h.PTransition[qi][qj] * h.PEmission[qj][V[t]] * S[t+1][qj] / p
+
+		fmt.Printf("U(%s, %d, %s, %s) = %f\n", V, t, qi, qj, u)
+		fmt.Printf("T(%s, %d, %s) = %f\n", V, t, qi, T[t][qi])
+		fmt.Printf("S(%s, %d, %s) = %f\n", V, t, qi, S[t][qi])
+		fmt.Printf("P(%s) = %f\n\n", V, p)
+
+		return
 	}
 
-	R := func(V []string, t int, q string) float64 {
+	R := func(V []string, t int, q string) (r float64) {
 		p, T := h.Forward(V)
 		_, S := h.Backward(V)
 
 		if t == len(V) {
-			return T[len(V)][q] * h.PTransition[q][h.final] / p
+			r = T[len(V)][q] * h.PTransition[q][h.final] / p
 		}
 
-		return T[t][q] * S[t][q] / p
+		r = T[t][q] * S[t][q] / p
+
+		fmt.Printf("R(%s, %d, %s) = %f\n", V, t, q, r)
+		fmt.Printf("T(%s, %d, %s) = %f\n", V, t, q, T[t][q])
+		fmt.Printf("S(%s, %d, %s) = %f\n", V, t, q, S[t][q])
+		fmt.Printf("P(%s) = %f\n\n", V, p)
+
+		return
 	}
 
 	t = make([]map[string]map[string]float64, i+1)
@@ -54,6 +72,8 @@ func (h *hmm) Train(c []Sample, i int) (t, e []map[string]map[string]float64) {
 				cEm[q][v] = 0
 			}
 		}
+
+		fmt.Printf("k = %d\n\n", k)
 
 		for _, s := range c {
 			for t := 1; t < len(s.V); t++ {
