@@ -26,10 +26,13 @@ func main() {
 
 	QS := append(Q, f)
 
-	for _, q1 := range QS {
-		for _, q2 := range QS {
+	for _, q1 := range Q {
+		for _, q2 := range Q {
 			h.PTransition[q1][q2] = 1 / float64(len(QS))
 		}
+
+		h.PTransition[f][q1] = 1 / float64(len(Q))
+		h.PTransition[q1][f] = 1 / float64(len(Q))
 	}
 
 	h.PEmission["DT"]["A"] = 0.35
