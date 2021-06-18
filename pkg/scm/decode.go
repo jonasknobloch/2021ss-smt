@@ -1,5 +1,7 @@
 package scm
 
+import "fmt"
+
 func (s *scm) Decode(f []string) (e []string) {
 	Y := make([][]string, 0, 5)
 	y := []string{}
@@ -21,6 +23,8 @@ func (s *scm) Decode(f []string) (e []string) {
 					}
 				}
 
+				fmt.Printf("Pruning worst hypothesis %v with a score of %f\n", Y[wk], ws)
+
 				Y[wk] = Y[len(Y)-1]
 				Y = Y[:len(Y)-1]
 			}
@@ -36,6 +40,8 @@ func (s *scm) Decode(f []string) (e []string) {
 				bs = p
 			}
 		}
+
+		fmt.Printf("Selecting best hypothesis %v with a score of %f\n", Y[bk], bs)
 
 		y = Y[bk]
 		Y[bk] = Y[len(Y)-1]
