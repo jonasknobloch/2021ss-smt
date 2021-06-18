@@ -55,5 +55,7 @@ func main() {
 
 	s := scm.NewSCM(VE, VF, final, b, t, l, lMax, YMax)
 	f := []string{"β", "γ"}
-	fmt.Println(s.Decode(f))
+	e := s.Decode(f)
+
+	fmt.Printf("Decoded %v to %v\n", f, e)
 }
