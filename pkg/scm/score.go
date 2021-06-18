@@ -64,12 +64,10 @@ func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
 
 		var sum float64
 		for _, ee := range e[:k] {
-			a := s.t[ee][ff]
-			b := float64(l-k) * max
-			sum = sum + a + b
+			sum = sum + s.t[ee][ff]
 		}
 
-		p = p * sum // sum can be 0
+		p = p * (sum + float64(l-k)*max)
 	}
 
 	// TODO: formatting
