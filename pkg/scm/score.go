@@ -5,10 +5,14 @@ import (
 	"math"
 )
 
-func (s *scm) scoreLM(l int, e []string) (p float64) {
+func (s *scm) scoreLM(l, k int, e []string) (p float64) {
 	p = s.b[s.final][e[0]]
 
-	for i := 1; i < len(e); i++ {
+	if k == 0 {
+		return p
+	}
+
+	for i := 1; i < k; i++ {
 		p = p * s.b[e[i-1]][e[i]]
 	}
 
@@ -25,41 +29,43 @@ func (s *scm) scoreLM(l int, e []string) (p float64) {
 	}
 
 	// TODO: formatting
-	switch l - len(e) {
+	switch l - k {
 	case 0:
-		a := s.b[e[len(e)-1]][s.final]
+		a := s.b[e[k-1]][s.final]
 		p = p * a
 	case 1:
-		a := max(e[len(e)-1:], s.VE)
+		a := max(e[k-1:], s.VE)
 		b := max(s.VE, []string{s.final})
 		p = p * a * b
 	default:
-		a := max(e[len(e)-1:], s.VE)
-		b := math.Pow(max(s.VE, s.VE), float64(l-len(e)-1))
+		a := max(e[k-1:], s.VE)
+		b := math.Pow(max(s.VE, s.VE), float64(l-k-1))
 		c := max(s.VE, []string{s.final})
 		p = p * a * b * c
 	}
 
-	fmt.Printf("scoreLM(%d, %v) = %f\n", l, e, p)
-
 	return
 }
 
-func (s *scm) scoreTM(l int, e, f []string) (p float64) {
+func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
+	if k == 0 {
+		return
+	}
+
 	p = 1
 
 	for _, ff := range f {
 		var max float64
-		for _, ee := range e {
+		for _, ee := range e[:k] {
 			if p := s.t[ee][ff]; p > max {
 				max = p
 			}
 		}
 
 		var sum float64
-		for _, ee := range e {
+		for _, ee := range e[:k] {
 			a := s.t[ee][ff]
-			b := float64(l-len(e)) * max
+			b := float64(l-k) * max
 			sum = sum + a + b
 		}
 
@@ -67,11 +73,9 @@ func (s *scm) scoreTM(l int, e, f []string) (p float64) {
 	}
 
 	// TODO: formatting
-	a := 1 / math.Pow(float64(l), float64(len(f)))
+	a := 1 / math.Pow(float64(l), float64(len(f))) // l >= k -> l > 1
 	b := s.l(l, len(f))
 	p = p * a * b
-
-	fmt.Printf("scoreTM(%d, %v) = %f\n", l, e, p)
 
 	return
 }
@@ -87,7 +91,21 @@ func (s *scm) score(e, f []string) float64 {
 
 	var max float64
 	for l := len(e); l <= s.lMax; l++ {
-		if p := s.scoreLM(l, e) * s.scoreTM(l, e, f); p > max {
+		k := len(e)
+		ll := l
+
+		if e[len(e)-1] == s.final {
+			k--
+			ll = k
+		}
+
+		lm := s.scoreLM(ll, k, e)
+		fmt.Printf("scoreLM(%d, %v) = %f\n", ll, e, lm)
+
+		tm := s.scoreTM(ll, k, e, f)
+		fmt.Printf("scoreTM(%d, %v) = %f\n", ll, e, tm)
+
+		if p := lm * tm; p > max {
 			max = p
 		}
 	}
