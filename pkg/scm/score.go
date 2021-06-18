@@ -56,7 +56,7 @@ func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
 
 	for _, ff := range f {
 		var max float64
-		for _, ee := range e[:k] {
+		for _, ee := range s.VE {
 			if p := s.t[ee][ff]; p > max {
 				max = p
 			}
