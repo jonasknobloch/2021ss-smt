@@ -74,10 +74,7 @@ func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
 		p = p * (sum + float64(l-k)*max)
 	}
 
-	// TODO: formatting
-	a := 1 / math.Pow(float64(l), float64(len(f)))
-	b := s.l(l, len(f))
-	p = p * a * b
+	p = p * 1 / math.Pow(float64(l), float64(len(f))) * s.l(l, len(f))
 
 	return
 }
