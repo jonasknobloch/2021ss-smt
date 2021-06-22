@@ -17,7 +17,11 @@ func (s *scm) Decode(f []string) (e []string) {
 				ws = 1
 
 				for k, y := range Y {
-					if p := s.score(y, f); p < ws {
+					p := s.score(y, f)
+
+					fmt.Printf("score(%v) = %f\n", y, p)
+
+					if p < ws {
 						wk = k
 						ws = p
 					}
@@ -35,6 +39,9 @@ func (s *scm) Decode(f []string) (e []string) {
 
 		for k, y := range Y {
 			p := s.score(y, f)
+
+			fmt.Printf("score(%v) = %f\n", y, p)
+
 			if p > bs {
 				bk = k
 				bs = p

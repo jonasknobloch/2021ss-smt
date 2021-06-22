@@ -81,20 +81,26 @@ func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
 
 func (s *scm) score(e, f []string) float64 {
 
-	// input french sentence
-	// h(f) = english sentence
-	// e_1 ... e_k k >= 0 prefix of potential translation
-	// l = full length of translation
-	// m = length of french input
-	// l_max >= l >= k
+	// f = input sentence
+	// e = prefix of potential translation (k = len(e))
+	// l = predicted length of translation (lMax >= l >= k)
+
+	k := len(e)
+
+	if e[len(e)-1] == s.final {
+		k--
+	}
+
+	if k > s.lMax {
+		fmt.Printf("Hypothesis %s exceeds maximal allowed length of %d\n", e, s.lMax)
+		return 0
+	}
 
 	var max float64
-	for l := len(e); l <= s.lMax; l++ {
-		k := len(e)
+	for l := k; l <= s.lMax; l++ {
 		ll := l
 
 		if e[len(e)-1] == s.final {
-			k--
 			ll = k
 		}
 
@@ -108,8 +114,6 @@ func (s *scm) score(e, f []string) float64 {
 			max = p
 		}
 	}
-
-	fmt.Printf("score(%v) = %f\n", e, max)
 
 	return max
 }
