@@ -6,16 +6,6 @@ import (
 )
 
 func (s *scm) scoreLM(l, k int, e []string) (p float64) {
-	p = s.b[s.final][e[0]]
-
-	if k == 0 {
-		return p
-	}
-
-	for i := 1; i < k; i++ {
-		p = p * s.b[e[i-1]][e[i]]
-	}
-
 	max := func(k1, k2 []string) (m float64) {
 		for _, i := range k1 {
 			for _, j := range k2 {
@@ -28,20 +18,38 @@ func (s *scm) scoreLM(l, k int, e []string) (p float64) {
 		return
 	}
 
-	// TODO: formatting
-	switch l - k {
-	case 0:
-		a := s.b[e[k-1]][s.final]
-		p = p * a
-	case 1:
-		a := max(e[k-1:], s.VE)
-		b := max(s.VE, []string{s.final})
-		p = p * a * b
-	default:
-		a := max(e[k-1:], s.VE)
-		b := math.Pow(max(s.VE, s.VE), float64(l-k-1))
-		c := max(s.VE, []string{s.final})
-		p = p * a * b * c
+	p = 1
+
+	y := []string{s.final}
+	y = append(y, e...)
+
+	for i := 0; i < l-k; i++ {
+		y = append(y, "")
+	}
+
+	y = append(y, s.final)
+
+	for i, v := range y {
+		if i+1 > len(y)-1 {
+			break
+		}
+
+		if v != "" && y[i+1] == "" {
+			p = p * max([]string{v}, s.VE)
+			continue
+		}
+
+		if v == "" && y[i+1] == "" {
+			p = p * max(s.VE, s.VE)
+			continue
+		}
+
+		if v == "" && y[i+1] != "" {
+			p = p * max(s.VE, []string{y[i+1]})
+			continue
+		}
+
+		p = p * s.b[v][y[i+1]]
 	}
 
 	return
