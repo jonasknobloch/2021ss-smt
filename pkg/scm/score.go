@@ -56,10 +56,6 @@ func (s *scm) scoreLM(l, k int, e []string) (p float64) {
 }
 
 func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
-	if k == 0 {
-		return
-	}
-
 	p = 1
 
 	for _, ff := range f {
@@ -79,7 +75,7 @@ func (s *scm) scoreTM(l, k int, e, f []string) (p float64) {
 	}
 
 	// TODO: formatting
-	a := 1 / math.Pow(float64(l), float64(len(f))) // l >= k -> l > 1
+	a := 1 / math.Pow(float64(l), float64(len(f)))
 	b := s.l(l, len(f))
 	p = p * a * b
 
